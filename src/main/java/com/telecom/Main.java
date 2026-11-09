@@ -1,17 +1,31 @@
 package com.telecom;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        IO.println(String.format("Hello and welcome!"));
+import com.telecom.model.StandartTariff;
+import com.telecom.model.Tariff;
+import com.telecom.model.UnlimitedDataTariff;
+import com.telecom.repository.TariffRepository;
+import com.telecom.service.TariffService;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
-        }
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // Проста in-memory реалізація репозиторію
+        TariffRepository inMemoryRepo = () -> List.of(
+                new StandartTariff("Basic 4G", 175.0, 4300, 500, 15),
+                new UnlimitedDataTariff("GigaStream", 350.0, 9200, 1000),
+                new StandartTariff("Light Voice", 100.0, 1500, 200, 5)
+        );
+
+        TariffService service = new TariffService(inMemoryRepo);
+
+        System.out.println("=== Total Subscribers ===");
+        System.out.println("Total: " + service.calculateTotalClients());
+
+        System.out.println("\n=== Tariffs Sorted by Monthly Fee ===");
+        service.sortTariffsBySubscriptionFee().forEach(System.out::println);
+
+        System.out.println("\n=== Tariffs in range [150.0 - 400.0 UAH] ===");
+        service.findTariffsByFeeRange(150.0, 400.0).forEach(System.out::println);
     }
 }
